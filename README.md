@@ -1,6 +1,8 @@
 Nested menus for the Contao OpenSource CMS
 ==========================================
 
+[![Build Status](https://travis-ci.org/bit3/contao-nested-menu.png?branch=master)](https://travis-ci.org/bit3/contao-nested-menu)
+
 The benefit of *nested menu* is to reduce the count of backend menu items and group them into a sub menu.
 
 Define nested menu items
