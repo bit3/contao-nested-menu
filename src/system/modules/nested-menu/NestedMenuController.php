@@ -2,7 +2,7 @@
 
 /**
  * Nested menu for Contao Open Source CMS
- * Copyright (C) 2010,2011,2012 Tristan Lins
+ * Copyright (C) 2013 bit3 UG
  *
  * PHP version 5
  *
