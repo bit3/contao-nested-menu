@@ -1,0 +1,23 @@
+<project name="Avisota" default="build">
+	<target name="clean">
+		<delete dir="${basedir}/build"/>
+	</target>
+
+	<target name="prepare">
+		<mkdir dir="${basedir}/build"/>
+		<mkdir dir="${basedir}/build/logs"/>
+	</target>
+
+	<target name="phpcs">
+		<exec dir="${basedir}"
+			  executable="${basedir}/vendor/bin/phpcs"
+			  output="${basedir}/build/logs/checkstyle.xml">
+			<arg line="-d 'error_reporting=E_ALL|~E_DEPRECATED|~E_NOTICE'
+			 		   --standard=${basedir}/vendor/bit3/php-coding-standard/Bit3Contao/ruleset.xml
+			 		   --extensions=php
+			 		   src"/>
+		</exec>
+	</target>
+
+	<target name="build" depends="clean,prepare,phpcs"/>
+</project>
