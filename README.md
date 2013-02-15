@@ -102,7 +102,9 @@ $GLOBALS['BE_MOD']['my'] = array(
 ```
 
 Keep in mind, the entries `entry5` till `entry9` are only hidden from the user.
-The new item provide a navigation listing, similar to the *old* navigation listing, known from the Contao 2 backend startpage.
+
+The new item `grouped_entries` now provide a navigation listing,
+similar to the *old* navigation listing, known from the Contao 2 backend startpage.
 
 It is also possible to make different groups in the sub menu, just add a `:group-name` to the `nested` key.
 
