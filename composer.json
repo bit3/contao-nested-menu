@@ -34,8 +34,8 @@
 	},
 	"repositories":[
 		{
-			"type":"vcs",
-			"url":"https://github.com/bit3/php-coding-standard"
+			"type":"composer",
+			"url":"http://packages.bit3.de/"
 		}
 	]
 }
