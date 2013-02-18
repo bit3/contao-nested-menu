@@ -5,7 +5,6 @@ language: php
 php:
   - "5.3"
 before_script:
-  - nslookup projects.bit3.de
   - host projects.bit3.de
   - dig projects.bit3.de
   - ping -c 3 projects.bit3.de
