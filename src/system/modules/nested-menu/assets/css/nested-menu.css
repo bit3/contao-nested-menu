@@ -9,9 +9,38 @@
  * @filesource
  */
 
+.nested-icon {
+	display: inline;
+	float: right;
+	width: 19px;
+	height: 19px;
+	vertical-align: middle;
+	text-align: center;
+}
 .nested_menu h3 {
 	background-position: left center;
 	background-repeat: no-repeat;
 	height: 16px;
 	line-height: 16px;
+}
+#tl_navigation ul.tl_level_2 > li {
+	position: relative;
+}
+#tl_navigation ul.nested-sub-menu {
+	position: absolute;
+	left: 100%;
+	top: 0;
+	margin-top: 0 !important;
+	z-index: 1;
+	background-color: #fff;
+	border: 1px solid #bbb;
+	-moz-border-radius: 0 3px 3px 0;
+	-webkit-border-radius: 0 3px 3px 0;
+	-o-border-radius: 0 3px 3px 0;
+	border-radius: 0 3px 3px 0;
+	overflow: hidden;
+}
+#tl_navigation ul.nested-sub-menu ul.tl_level_2 {
+	padding-left: 6px !important;
+	padding-right: 6px !important;
 }

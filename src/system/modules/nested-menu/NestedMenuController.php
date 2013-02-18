@@ -61,62 +61,67 @@ class NestedMenuController
 	 */
 	public function hookLoadLanguageFile()
 	{
-		foreach ($GLOBALS['BE_MOD'] as &$modules) {
-			foreach ($modules as $moduleKey => $module) {
-				if (!empty($module['nested'])) {
-					list($nested) = explode(':', $module['nested']);
+		if (TL_MODE == 'BE') {
+			foreach ($GLOBALS['BE_MOD'] as &$modules) {
+				foreach ($modules as $moduleKey => $module) {
+					if (!empty($module['nested'])) {
+						list($nested) = explode(':', $module['nested']);
 
-					// create nested menu entry
-					if (!isset($modules[$nested])) {
-						if (isset($GLOBALS['TL_LANG']['MOD'][$nested])) {
-							$label = $GLOBALS['TL_LANG']['MOD'][$nested];
+						// create nested menu entry
+						if (!isset($modules[$nested])) {
+							if (isset($GLOBALS['TL_LANG']['MOD'][$nested])) {
+								$label = $GLOBALS['TL_LANG']['MOD'][$nested];
 
-							if (is_array($label)) {
-								$label = $label[0];
+								if (is_array($label)) {
+									$label = $label[0];
+								}
 							}
+							if (empty($label)) {
+								$label = $nested;
+							}
+
+							$pos = array_search(
+								$moduleKey,
+								array_keys($modules)
+							);
+
+							$left  = array_slice($modules, 0, $pos);
+							$right = array_slice($modules, $pos);
+
+							$middle = array(
+								$nested => array(
+									'tables'     => array(''),
+									'stylesheet' => 'system/modules/nested-menu/assets/css/nested-menu.css'
+								)
+							);
+
+							$modules = array_merge($left, $middle, $right);
 						}
-						if (empty($label)) {
-							$label = $nested;
+						else {
+							if (!isset($modules[$nested]['tables'])) {
+								$modules[$nested]['tables'] = array('');
+							}
+							else if ($modules[$nested]['tables'][0] !== '') {
+								array_unshift($modules[$nested]['tables'], '');
+							}
+
+							$modules[$nested]['callback'] = 'NestedMenuController';
 						}
 
-						$pos = array_search(
-							$moduleKey,
-							array_keys($modules)
-						);
-
-						$left  = array_slice($modules, 0, $pos);
-						$right = array_slice($modules, $pos);
-
-						$middle = array(
-							$nested => array(
-								'tables'     => array(''),
-								'stylesheet' => 'system/modules/nested-menu/assets/css/nested-menu.css'
-							)
-						);
-
-						$modules = array_merge($left, $middle, $right);
-					}
-					else {
-						if (!isset($modules[$nested]['tables'])) {
-							$modules[$nested]['tables'] = array('');
+						// merge tables
+						if (isset($module['tables'])) {
+							$modules[$nested]['tables'] = array_merge(
+								$modules[$nested]['tables'],
+								$module['tables']
+							);
 						}
-						else if ($modules[$nested]['tables'][0] !== '') {
-							array_unshift($modules[$nested]['tables'], '');
-						}
-
-						$modules[$nested]['callback']   = 'NestedMenuController';
-						$modules[$nested]['stylesheet'] = 'system/modules/nested-menu/assets/css/nested-menu.css';
-					}
-
-					// merge tables
-					if (isset($module['tables'])) {
-						$modules[$nested]['tables'] = array_merge(
-							$modules[$nested]['tables'],
-							$module['tables']
-						);
 					}
 				}
 			}
+
+			$GLOBALS['TL_JAVASCRIPT']['nested-menu'] = 'system/modules/nested-menu/assets/js/nested-menu.js';
+
+			$GLOBALS['TL_CSS']['nested-menu'] = 'system/modules/nested-menu/assets/css/nested-menu.css';
 		}
 
 		unset($GLOBALS['TL_HOOKS']['loadLanguageFile']['nested-menu']);
@@ -132,9 +137,11 @@ class NestedMenuController
 	 */
 	public function hookGetUserNavigation(array $navigation, $showAll)
 	{
-		if (!$showAll) {
+		if (TL_MODE == 'BE' && !$showAll) {
 			$input = Input::getInstance();
 			$do    = $input->get('do');
+
+			$menu = array();
 
 			foreach ($navigation as $groupKey => $group) {
 				if (is_array($group['modules'])) {
@@ -146,12 +153,38 @@ class NestedMenuController
 							if ($do == $moduleName) {
 								$modules[$nested]['class'] .= ' active';
 							}
+							if (!isset($modules[$nested]['_nested_icon'])) {
+								$modules[$nested]['_nested_icon'] = true;
+								$modules[$nested]['label'] .= sprintf(
+									'<span class="nested-icon" id="nested_%s">►</span>',
+									$nested
+								);
+							}
+
+							if (!isset($menu[$nested][$module['nested']])) {
+								$label = isset($GLOBALS['TL_LANG']['MOD'][$module['nested']])
+									? $GLOBALS['TL_LANG']['MOD'][$module['nested']]
+									: $module['nested'];
+
+								$menu[$nested][$module['nested']] = array(
+									'label'   => $label,
+									'modules' => array($module)
+								);
+							}
+							else {
+								$menu[$nested][$module['nested']]['modules'][] = $module;
+							}
 
 							unset($modules[$moduleName]);
 						}
 					}
 				}
 			}
+
+			$GLOBALS['TL_MOOTOOLS']['nested-menu'] = sprintf(
+				'<script>var nestedMenuItems = %s;</script>',
+				json_encode($menu)
+			);
 		}
 		return $navigation;
 	}
@@ -163,8 +196,38 @@ class NestedMenuController
 	 */
 	public function generate()
 	{
+		$input = Input::getInstance();
+
+		$key = $input->get('key');
+		if ($key) {
+			$do = $input->get('do');
+
+			if (isset($GLOBALS['BE_MOD'][$do][$key])) {
+				list($className, $methodName) = $GLOBALS['BE_MOD'][$do][$key];
+
+				$class = new ReflectionClass($className);
+				if ($class->hasMethod($methodName)) {
+					$module = $class->newInstance();
+					$method = $class->getMethod($methodName);
+					return $method->invoke($module, $this->objDc, $this->objDc->table, $GLOBALS['BE_MOD'][$do]);
+				}
+				else {
+					return sprintf(
+						'<p class="tl_error">Method %s:%s not found!</p>',
+						$className,
+						$methodName
+					);
+				}
+			}
+			else {
+				return sprintf(
+					'<p class="tl_error">Method %s not found!</p>',
+					$key
+				);
+			}
+		}
+
 		if ($this->objDc->table) {
-			$input = Input::getInstance();
 			$act = $input->get('act');
 
 			if (!strlen($act) || $act == 'paste' || $act == 'select') {
@@ -232,7 +295,7 @@ class NestedMenuController
 		$navigation = $user->navigation(true);
 
 		$input = Input::getInstance();
-		$do = $input->get('do');
+		$do    = $input->get('do');
 
 		$groups = array();
 
