@@ -202,29 +202,30 @@ class NestedMenuController
 		if ($key) {
 			$do = $input->get('do');
 
-			if (isset($GLOBALS['BE_MOD'][$do][$key])) {
-				list($className, $methodName) = $GLOBALS['BE_MOD'][$do][$key];
+			foreach ($GLOBALS['BE_MOD'] as $modules) {
+				if (isset($modules[$do]) && isset($modules[$do][$key])) {
+					list($className, $methodName) = $modules[$do][$key];
 
-				$class = new ReflectionClass($className);
-				if ($class->hasMethod($methodName)) {
-					$module = $class->newInstance();
-					$method = $class->getMethod($methodName);
-					return $method->invoke($module, $this->objDc, $this->objDc->table, $GLOBALS['BE_MOD'][$do]);
-				}
-				else {
-					return sprintf(
-						'<p class="tl_error">Method %s:%s not found!</p>',
-						$className,
-						$methodName
-					);
+					$class = new ReflectionClass($className);
+					if ($class->hasMethod($methodName)) {
+						$module = $class->newInstance();
+						$method = $class->getMethod($methodName);
+						return $method->invoke($module, $this->objDc, $this->objDc->table, $GLOBALS['BE_MOD'][$do]);
+					}
+					else {
+						return sprintf(
+							'<p class="tl_error">Method %s:%s not found!</p>',
+							$className,
+							$methodName
+						);
+					}
 				}
 			}
-			else {
-				return sprintf(
-					'<p class="tl_error">Method %s not found!</p>',
-					$key
-				);
-			}
+
+			return sprintf(
+				'<p class="tl_error">Method %s not found!</p>',
+				$key
+			);
 		}
 
 		if ($this->objDc->table) {
