@@ -1,3 +1,14 @@
+/**
+ * Nested menu for Contao Open Source CMS
+ * Copyright (C) 2013 bit3 UG
+ *
+ * @copyright  bit3 UG 2013
+ * @author     Tristan Lins <tristan.lins@bit3.de>
+ * @package    NestedMenu
+ * @license    LGPL
+ * @filesource
+ */
+
 $(document).addEvent('domready', function() {
 	var left = $('left');
 
@@ -5,6 +16,8 @@ $(document).addEvent('domready', function() {
 		var icon = $('nested_' + nested);
 
 		if (icon) {
+			icon.inject(icon.getParent(), 'after');
+
 			var menu = new Element('ul');
 			menu.addClass('tl_level_1');
 			menu.addClass('nested-sub-menu');
@@ -40,11 +53,11 @@ $(document).addEvent('domready', function() {
 			});
 
 			menu.setStyle('display', 'none');
-			menu.inject(icon.getParent(), 'after');
+			menu.inject(icon, 'after');
 
 			var size = menu.getDimensions();
 
-			menu.setStyle('height', 0);
+			menu.setStyle('width', 0);
 			menu.setStyle('opacity', 0);
 			menu.setStyle('display', '');
 
@@ -53,16 +66,27 @@ $(document).addEvent('domready', function() {
 				link: 'cancel'
 			});
 
-			var timeout = false;
+			var li = icon.getParent();
+			var navigation = li.getParent().getParent().getParent();
+
 			icon.addEvent('mouseenter', function() {
+				var navigationPosition = navigation.getPosition();
+
+				var offset = li.getPosition();
+				var top = offset.y - Math.ceil(size.height / 2);
+
+				menu.setStyles({
+					left: (offset.x + li.getWidth()) + 'px',
+					top: Math.max(navigationPosition.y, top) + 'px'
+				})
 				menu.morph({
-					height: size.height + 'px',
+					width: size.width + 'px',
 					opacity: 1
 				});
 			});
-			icon.getParent().getParent().addEvent('mouseleave', function() {
+			li.addEvent('mouseleave', function() {
 				menu.morph({
-					height: 0,
+					width: 0,
 					opacity: 0
 				});
 			});

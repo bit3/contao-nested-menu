@@ -9,22 +9,20 @@
  * @filesource
  */
 
-.nested-icon {
-	display: inline;
-	float: right;
-	width: 19px;
-	height: 19px;
-	vertical-align: middle;
-	text-align: center;
-}
 .nested_menu h3 {
 	background-position: left center;
 	background-repeat: no-repeat;
 	height: 16px;
 	line-height: 16px;
 }
-#tl_navigation ul.tl_level_2 > li {
-	position: relative;
+#tl_navigation .nested-icon {
+	display: inline;
+	float: right;
+	width: 19px;
+	height: 19px;
+	vertical-align: middle;
+	text-align: center;
+	cursor: default;
 }
 #tl_navigation ul.nested-sub-menu {
 	position: absolute;
@@ -39,6 +37,7 @@
 	-o-border-radius: 0 3px 3px 0;
 	border-radius: 0 3px 3px 0;
 	overflow: hidden;
+	white-space: nowrap;
 }
 #tl_navigation ul.nested-sub-menu ul.tl_level_2 {
 	padding-left: 6px !important;
