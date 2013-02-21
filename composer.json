@@ -37,5 +37,12 @@
 			"type":"composer",
 			"url":"http://packages.bit3.de/"
 		}
-	]
+	],
+	"extra":{
+		"contao": {
+			"targets":{
+				"src/system/modules/nested-menu":"system/modules/nested-menu"
+			}
+		}
+	}
 }
