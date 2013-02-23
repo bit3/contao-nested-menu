@@ -40,7 +40,7 @@
 	],
 	"extra":{
 		"contao": {
-			"targets":{
+			"symlinks":{
 				"src/system/modules/nested-menu":"system/modules/nested-menu"
 			}
 		}
