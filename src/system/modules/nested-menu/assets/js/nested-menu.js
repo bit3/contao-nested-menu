@@ -41,7 +41,7 @@ $(document).addEvent('domready', function() {
 					linkContainer.inject(childrenContainer);
 
 					var link = new Element('a');
-					link.addClass(module.class);
+					link.addClass(module['class']);
 					link.setAttribute('href', module.href);
 					link.setAttribute('title', module.title);
 					if (module.icon) {
