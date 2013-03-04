@@ -32,12 +32,6 @@
 	"autoload":{
 		"classmap":["src/"]
 	},
-	"repositories":[
-		{
-			"type":"composer",
-			"url":"http://packages.bit3.de/"
-		}
-	],
 	"extra":{
 		"contao": {
 			"symlinks":{
