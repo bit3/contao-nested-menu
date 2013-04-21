@@ -1,7 +1,6 @@
 {
 	"name":"bit3/contao-nested-menu",
 	"description":"Nested menus for Contao OpenSource CMS",
-	"version":"1.0.0",
 	"keywords":["contao", "menu"],
 	"type":"contao-module",
 	"homepage":"http://bit3.de",
