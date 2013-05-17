@@ -35,7 +35,7 @@
 	"extra":{
 		"contao": {
 			"symlinks":{
-				"src/system/modules/nested-menu":"system/modules/nested-menu"
+				"contao":"system/modules/nested-menu"
 			}
 		}
 	}
