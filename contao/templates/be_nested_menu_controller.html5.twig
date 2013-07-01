@@ -1,5 +1,5 @@
 {% set lang = _lang.MOD %}
-<h1 id="tl_welcome">{% if lang[do] %}{{ lang[do][0] }}{% else %}{{ do }}{% endif %}</h1>
+{% if settings.headline %}<h1 id="tl_welcome">{% if lang[do] %}{{ lang[do][0] }}{% else %}{{ do }}{% endif %}</h1>{% endif %}
 
 <div id="tl_soverview" class="nested_menu {{ do }}">
 

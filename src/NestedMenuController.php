@@ -291,14 +291,30 @@ class NestedMenuController
 	 */
 	protected function compile()
 	{
-		$user = BackendUser::getInstance();
+		$user  = BackendUser::getInstance();
+		$input = Input::getInstance();
 
 		$navigation = $user->navigation(true);
 
-		$input = Input::getInstance();
-		$do    = $input->get('do');
+		$settings    = array(
+			'headline' => true
+		);
+		$do          = $input->get('do');
+		$groups      = array();
+		$preContent  = '';
+		$postContent = '';
 
-		$groups = array();
+		foreach ($GLOBALS['BE_MOD'] as $modules) {
+			if (isset($modules[$do])) {
+				if (isset($modules[$do]['nested-config'])) {
+					$settings = array_merge(
+						$settings,
+						$modules[$do]['nested-config']
+					);
+				}
+				break;
+			}
+		}
 
 		// collect groups and items for nested menu
 		foreach ($navigation as $groupKey => $group) {
@@ -322,9 +338,6 @@ class NestedMenuController
 				}
 			}
 		}
-
-		$preContent  = '';
-		$postContent = '';
 
 		// HOOK: add custom logic
 		if (
@@ -359,9 +372,10 @@ class NestedMenuController
 			}
 		}
 
-		$this->Template->do     = $do;
-		$this->Template->pre    = $preContent;
-		$this->Template->post   = $postContent;
-		$this->Template->groups = $groups;
+		$this->Template->settings = $settings;
+		$this->Template->do       = $do;
+		$this->Template->pre      = $preContent;
+		$this->Template->post     = $postContent;
+		$this->Template->groups   = $groups;
 	}
 }
