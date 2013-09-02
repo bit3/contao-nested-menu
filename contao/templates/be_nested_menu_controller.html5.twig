@@ -5,13 +5,13 @@
 
 	{{ pre }}
 
-	<div id="tl_moverview">
+	<div id="tl_nested_menu">
 		{% for group, modules in groups %}
 
 			<h2>{% if lang[group] %}{% if lang[group]|length <= 2 %}{{ lang[group][0] }}{% else %}{{ lang[group] }}{% endif %}{% else %}{{ group }}{% endif %}</h2>
 
 			{% for moduleName, module in modules %}
-				<div class="tl_module_desc{% if module.class %} {{ module.class }}{% endif %}"{{ module.containerAttributes }}>
+				<div class="tl_nested_menu_group{% if module.class %} {{ module.class }}{% endif %}"{{ module.containerAttributes }}>
 					<h3{% if module.icon %} {{ module.icon }}{% endif %}{{ module.headlineAttributes }}>
 						<a href="{{ module.href }}" class="navigation {{ moduleName }}"{{ module.linkAttributes }}>{{ module.label }}</a>
 					</h3>
