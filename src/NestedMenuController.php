@@ -166,6 +166,13 @@ class NestedMenuController
 									? $GLOBALS['TL_LANG']['MOD'][$module['nested']]
 									: $module['nested'];
 
+								if (is_array($label)) {
+									if (count($label) >= 2) {
+										array_shift($label);
+									}
+									$label = array_shift($label);
+								}
+
 								$menu[$nested][$module['nested']] = array(
 									'label'   => $label,
 									'modules' => array($module)
