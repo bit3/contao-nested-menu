@@ -12,6 +12,10 @@
 $(document).addEvent('domready', function() {
 	var left = $('left');
 
+	if (!window.nestedMenuItems) {
+		return;
+	}
+
 	Object.each(nestedMenuItems, function(groups, nested) {
 		var icon = $('nested_' + nested);
 
