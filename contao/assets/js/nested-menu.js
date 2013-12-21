@@ -74,15 +74,11 @@ $(document).addEvent('domready', function() {
 			var navigation = li.getParent().getParent().getParent();
 
 			icon.addEvent('mouseenter', function() {
-				var navigationPosition = navigation.getPosition();
+				menu.position({
+					relativeTo: icon.getParent(),
+					position: "right top"
+				});
 
-				var offset = li.getPosition();
-				var top = offset.y - Math.ceil(size.height / 2);
-
-				menu.setStyles({
-					left: (offset.x + li.getWidth()) + 'px',
-					top: Math.max(navigationPosition.y, top) + 'px'
-				})
 				menu.morph({
 					width: size.width + 'px',
 					opacity: 1
