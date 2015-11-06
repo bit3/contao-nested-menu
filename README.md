@@ -1,7 +1,11 @@
 Nested menus for the Contao OpenSource CMS
 ==========================================
 
-[![Build Status](https://travis-ci.org/bit3/contao-nested-menu.png?branch=master)](https://travis-ci.org/bit3/contao-nested-menu)
+[![Version](http://img.shields.io/packagist/v/contao-community-alliance/nested-menu.svg?style=flat-square)](https://packagist.org/packages/contao-community-alliance/nested-menu)
+[![Stable Build Status](http://img.shields.io/travis/contao-community-alliance/nested-menu/master.svg?style=flat-square&label=stable build)](https://travis-ci.org/contao-community-alliance/nested-menu)
+[![Upstream Build Status](http://img.shields.io/travis/contao-community-alliance/nested-menu/develop.svg?style=flat-square&label=dev build)](https://travis-ci.org/contao-community-alliance/nested-menu)
+[![License](http://img.shields.io/packagist/l/contao-community-alliance/nested-menu.svg?style=flat-square)](http://spdx.org/licenses/LGPL-3.0+)
+[![Downloads](http://img.shields.io/packagist/dt/contao-community-alliance/nested-menu.svg?style=flat-square)](https://packagist.org/packages/contao-community-alliance/nested-menu)
 
 The benefit of *nested menu* is to reduce the count of backend menu items and group them into a sub menu.
 
