@@ -52,8 +52,9 @@ class NestedMenuController extends TwigBackendModule
     /**
      * Merge the BE_MOD entries and build nested items.
      *
-     * @param $name
-     * @param $language
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function hookLoadLanguageFile()
     {
@@ -61,61 +62,13 @@ class NestedMenuController extends TwigBackendModule
             foreach ($GLOBALS['BE_MOD'] as &$modules) {
                 foreach ($modules as $moduleKey => $module) {
                     if (!empty($module['nested'])) {
-                        list($nested) = explode(':', $module['nested']);
-
-                        // create nested menu entry
-                        if (!isset($modules[$nested])) {
-                            if (isset($GLOBALS['TL_LANG']['MOD'][$nested])) {
-                                $label = $GLOBALS['TL_LANG']['MOD'][$nested];
-
-                                if (is_array($label)) {
-                                    $label = $label[0];
-                                }
-                            }
-                            if (empty($label)) {
-                                $label = $nested;
-                            }
-
-                            $pos = array_search(
-                                $moduleKey,
-                                array_keys($modules)
-                            );
-
-                            $left = array_slice($modules, 0, $pos);
-                            $right = array_slice($modules, $pos);
-
-                            $middle = array(
-                                $nested => array(
-                                    'tables' => array(''),
-                                    'stylesheet' => 'system/modules/nested-menu/assets/css/nested-menu.css',
-                                ),
-                            );
-
-                            $modules = array_merge($left, $middle, $right);
-                        } else {
-                            if (!isset($modules[$nested]['tables'])) {
-                                $modules[$nested]['tables'] = array('');
-                            } elseif ($modules[$nested]['tables'][0] !== '') {
-                                array_unshift($modules[$nested]['tables'], '');
-                            }
-
-                            $modules[$nested]['callback'] = 'NestedMenuController';
-                        }
-
-                        // merge tables
-                        if (isset($module['tables'])) {
-                            $modules[$nested]['tables'] = array_merge(
-                                $modules[$nested]['tables'],
-                                $module['tables']
-                            );
-                        }
+                        $this->prepareNestedMenuEntry($module, $modules, $moduleKey);
                     }
                 }
             }
 
             $GLOBALS['TL_JAVASCRIPT']['nested-menu'] = 'system/modules/nested-menu/assets/js/nested-menu.js';
-
-            $GLOBALS['TL_CSS']['nested-menu'] = 'system/modules/nested-menu/assets/css/nested-menu.css';
+            $GLOBALS['TL_CSS']['nested-menu']        = 'system/modules/nested-menu/assets/css/nested-menu.css';
         }
 
         unset($GLOBALS['TL_HOOKS']['loadLanguageFile']['nested-menu']);
@@ -128,6 +81,8 @@ class NestedMenuController extends TwigBackendModule
      * @param bool  $showAll
      *
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function hookGetUserNavigation(array $navigation, $showAll)
     {
@@ -194,6 +149,8 @@ class NestedMenuController extends TwigBackendModule
      * Generate the module.
      *
      * @return string
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     public function generate()
     {
@@ -287,6 +244,10 @@ class NestedMenuController extends TwigBackendModule
 
     /**
      * Compile the current element.
+     *
+     * @return void
+     *
+     * @SuppressWarnings(PHPMD.Superglobals)
      */
     protected function compile()
     {
@@ -376,5 +337,66 @@ class NestedMenuController extends TwigBackendModule
         $this->Template->pre = $preContent;
         $this->Template->post = $postContent;
         $this->Template->groups = $groups;
+    }
+
+    /**
+     * Prepare nested menu entry.
+     *
+     * @param array $modules   Registered modules.
+     * @param array $module    Current module.
+     * @param int   $moduleKey Module key.
+     *
+     * @return void
+     */
+    protected function prepareNestedMenuEntry(&$modules, $module, $moduleKey)
+    {
+        list($nested) = explode(':', $module['nested']);
+
+        // create nested menu entry
+        if (!isset($modules[$nested])) {
+            if (isset($GLOBALS['TL_LANG']['MOD'][$nested])) {
+                $label = $GLOBALS['TL_LANG']['MOD'][$nested];
+
+                if (is_array($label)) {
+                    $label = $label[0];
+                }
+            }
+            if (empty($label)) {
+                $label = $nested;
+            }
+
+            $pos = array_search(
+                $moduleKey,
+                array_keys($modules)
+            );
+
+            $left  = array_slice($modules, 0, $pos);
+            $right = array_slice($modules, $pos);
+
+            $middle = array(
+                $nested => array(
+                    'tables'     => array(''),
+                    'stylesheet' => 'system/modules/nested-menu/assets/css/nested-menu.css',
+                ),
+            );
+
+            $modules = array_merge($left, $middle, $right);
+        } else {
+            if (!isset($modules[$nested]['tables'])) {
+                $modules[$nested]['tables'] = array('');
+            } elseif ($modules[$nested]['tables'][0] !== '') {
+                array_unshift($modules[$nested]['tables'], '');
+            }
+
+            $modules[$nested]['callback'] = 'NestedMenuController';
+        }
+
+        // merge tables
+        if (isset($module['tables'])) {
+            $modules[$nested]['tables'] = array_merge(
+                $modules[$nested]['tables'],
+                $module['tables']
+            );
+        }
     }
 }
