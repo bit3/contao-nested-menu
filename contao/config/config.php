@@ -13,5 +13,8 @@
  * @filesource
  */
 
-$GLOBALS['TL_HOOKS']['loadLanguageFile']['nested-menu']  = array('NestedMenuController', 'hookLoadLanguageFile');
-$GLOBALS['TL_HOOKS']['getUserNavigation']['nested-menu'] = array('NestedMenuController', 'hookGetUserNavigation');
+
+if (TL_MODE === 'BE') {
+	$GLOBALS['TL_HOOKS']['loadLanguageFile']['nested-menu']  = array('NestedMenuController', 'hookLoadLanguageFile');
+	$GLOBALS['TL_HOOKS']['getUserNavigation']['nested-menu'] = array('NestedMenuController', 'hookGetUserNavigation');
+}
