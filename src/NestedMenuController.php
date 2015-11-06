@@ -2,387 +2,378 @@
 
 /**
  * Nested menu for Contao Open Source CMS
- * Copyright (C) 2013 bit3 UG
+ * Copyright (C) 2013 bit3 UG.
  *
  * PHP version 5
  *
  * @copyright  bit3 UG 2013
  * @author     Tristan Lins <tristan.lins@bit3.de>
- * @package    NestedMenu
  * @license    LGPL
  * @filesource
  */
-
 
 /**
  * Nested menu backend controller.
  *
  * @copyright  bit3 UG 2013
  * @author     Tristan Lins <tristan.lins@bit3.de>
- * @package    NestedMenu
  */
-class NestedMenuController
-	extends TwigBackendModule
+class NestedMenuController extends TwigBackendModule
 {
-	/**
-	 * Singleton instance.
-	 *
-	 * @var NestedMenuController
-	 */
-	protected static $instance = null;
+    /**
+     * Singleton instance.
+     *
+     * @var NestedMenuController
+     */
+    protected static $instance = null;
 
-	/**
-	 * Get singleton instance.
-	 *
-	 * @return NestedMenuController
-	 */
-	public static function getInstance()
-	{
-		if (self::$instance === null) {
-			self::$instance = new NestedMenuController();
-		}
-		return self::$instance;
-	}
+    /**
+     * Get singleton instance.
+     *
+     * @return NestedMenuController
+     */
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
 
-	/**
-	 * Template name
-	 *
-	 * @var string
-	 */
-	protected $strTemplate = 'be_nested_menu_controller';
+        return self::$instance;
+    }
 
-	/**
-	 * Merge the BE_MOD entries and build nested items.
-	 *
-	 * @param $name
-	 * @param $language
-	 *
-	 * @return void
-	 */
-	public function hookLoadLanguageFile()
-	{
-		if (TL_MODE == 'BE') {
-			foreach ($GLOBALS['BE_MOD'] as &$modules) {
-				foreach ($modules as $moduleKey => $module) {
-					if (!empty($module['nested'])) {
-						list($nested) = explode(':', $module['nested']);
+    /**
+     * Template name.
+     *
+     * @var string
+     */
+    protected $strTemplate = 'be_nested_menu_controller';
 
-						// create nested menu entry
-						if (!isset($modules[$nested])) {
-							if (isset($GLOBALS['TL_LANG']['MOD'][$nested])) {
-								$label = $GLOBALS['TL_LANG']['MOD'][$nested];
+    /**
+     * Merge the BE_MOD entries and build nested items.
+     *
+     * @param $name
+     * @param $language
+     */
+    public function hookLoadLanguageFile()
+    {
+        if (TL_MODE == 'BE') {
+            foreach ($GLOBALS['BE_MOD'] as &$modules) {
+                foreach ($modules as $moduleKey => $module) {
+                    if (!empty($module['nested'])) {
+                        list($nested) = explode(':', $module['nested']);
 
-								if (is_array($label)) {
-									$label = $label[0];
-								}
-							}
-							if (empty($label)) {
-								$label = $nested;
-							}
+                        // create nested menu entry
+                        if (!isset($modules[$nested])) {
+                            if (isset($GLOBALS['TL_LANG']['MOD'][$nested])) {
+                                $label = $GLOBALS['TL_LANG']['MOD'][$nested];
 
-							$pos = array_search(
-								$moduleKey,
-								array_keys($modules)
-							);
+                                if (is_array($label)) {
+                                    $label = $label[0];
+                                }
+                            }
+                            if (empty($label)) {
+                                $label = $nested;
+                            }
 
-							$left  = array_slice($modules, 0, $pos);
-							$right = array_slice($modules, $pos);
+                            $pos = array_search(
+                                $moduleKey,
+                                array_keys($modules)
+                            );
 
-							$middle = array(
-								$nested => array(
-									'tables'     => array(''),
-									'stylesheet' => 'system/modules/nested-menu/assets/css/nested-menu.css'
-								)
-							);
+                            $left = array_slice($modules, 0, $pos);
+                            $right = array_slice($modules, $pos);
 
-							$modules = array_merge($left, $middle, $right);
-						}
-						else {
-							if (!isset($modules[$nested]['tables'])) {
-								$modules[$nested]['tables'] = array('');
-							}
-							else if ($modules[$nested]['tables'][0] !== '') {
-								array_unshift($modules[$nested]['tables'], '');
-							}
+                            $middle = array(
+                                $nested => array(
+                                    'tables' => array(''),
+                                    'stylesheet' => 'system/modules/nested-menu/assets/css/nested-menu.css',
+                                ),
+                            );
 
-							$modules[$nested]['callback'] = 'NestedMenuController';
-						}
+                            $modules = array_merge($left, $middle, $right);
+                        } else {
+                            if (!isset($modules[$nested]['tables'])) {
+                                $modules[$nested]['tables'] = array('');
+                            } elseif ($modules[$nested]['tables'][0] !== '') {
+                                array_unshift($modules[$nested]['tables'], '');
+                            }
 
-						// merge tables
-						if (isset($module['tables'])) {
-							$modules[$nested]['tables'] = array_merge(
-								$modules[$nested]['tables'],
-								$module['tables']
-							);
-						}
-					}
-				}
-			}
+                            $modules[$nested]['callback'] = 'NestedMenuController';
+                        }
 
-			$GLOBALS['TL_JAVASCRIPT']['nested-menu'] = 'system/modules/nested-menu/assets/js/nested-menu.js';
+                        // merge tables
+                        if (isset($module['tables'])) {
+                            $modules[$nested]['tables'] = array_merge(
+                                $modules[$nested]['tables'],
+                                $module['tables']
+                            );
+                        }
+                    }
+                }
+            }
 
-			$GLOBALS['TL_CSS']['nested-menu'] = 'system/modules/nested-menu/assets/css/nested-menu.css';
-		}
+            $GLOBALS['TL_JAVASCRIPT']['nested-menu'] = 'system/modules/nested-menu/assets/js/nested-menu.js';
 
-		unset($GLOBALS['TL_HOOKS']['loadLanguageFile']['nested-menu']);
-	}
+            $GLOBALS['TL_CSS']['nested-menu'] = 'system/modules/nested-menu/assets/css/nested-menu.css';
+        }
 
-	/**
-	 * Merge nesting items into one item.
-	 *
-	 * @param array $navigation
-	 * @param bool  $showAll
-	 *
-	 * @return array
-	 */
-	public function hookGetUserNavigation(array $navigation, $showAll)
-	{
-		if (TL_MODE == 'BE' && !$showAll) {
-			$input = Input::getInstance();
-			$do    = $input->get('do');
+        unset($GLOBALS['TL_HOOKS']['loadLanguageFile']['nested-menu']);
+    }
 
-			$menu = array();
+    /**
+     * Merge nesting items into one item.
+     *
+     * @param array $navigation
+     * @param bool  $showAll
+     *
+     * @return array
+     */
+    public function hookGetUserNavigation(array $navigation, $showAll)
+    {
+        if (TL_MODE == 'BE' && !$showAll) {
+            $input = Input::getInstance();
+            $do = $input->get('do');
 
-			foreach ($navigation as $groupKey => $group) {
-				if (is_array($group['modules'])) {
-					$modules = & $navigation[$groupKey]['modules'];
-					foreach ($modules as $moduleName => $module) {
-						if (!empty($module['nested'])) {
-							list($nested) = explode(':', $module['nested']);
+            $menu = array();
 
-							if ($do == $moduleName) {
-								$modules[$nested]['class'] .= ' active';
-							}
-							if (!isset($modules[$nested]['_nested_icon'])) {
-								$modules[$nested]['_nested_icon'] = true;
-								$modules[$nested]['label'] .= sprintf(
-									'<span class="nested-icon" id="nested_%s">►</span>',
-									$nested
-								);
-							}
+            foreach ($navigation as $groupKey => $group) {
+                if (is_array($group['modules'])) {
+                    $modules = &$navigation[$groupKey]['modules'];
+                    foreach ($modules as $moduleName => $module) {
+                        if (!empty($module['nested'])) {
+                            list($nested) = explode(':', $module['nested']);
 
-							if (!isset($menu[$nested][$module['nested']])) {
-								$label = isset($GLOBALS['TL_LANG']['MOD'][$module['nested']])
-									? $GLOBALS['TL_LANG']['MOD'][$module['nested']]
-									: $module['nested'];
+                            if ($do == $moduleName) {
+                                $modules[$nested]['class'] .= ' active';
+                            }
+                            if (!isset($modules[$nested]['_nested_icon'])) {
+                                $modules[$nested]['_nested_icon'] = true;
+                                $modules[$nested]['label'] .= sprintf(
+                                    '<span class="nested-icon" id="nested_%s">►</span>',
+                                    $nested
+                                );
+                            }
 
-								if (is_array($label)) {
-									if (count($label) >= 2) {
-										array_shift($label);
-									}
-									$label = array_shift($label);
-								}
+                            if (!isset($menu[$nested][$module['nested']])) {
+                                $label = isset($GLOBALS['TL_LANG']['MOD'][$module['nested']])
+                                    ? $GLOBALS['TL_LANG']['MOD'][$module['nested']]
+                                    : $module['nested'];
 
-								$menu[$nested][$module['nested']] = array(
-									'label'   => $label,
-									'modules' => array($module)
-								);
-							}
-							else {
-								$menu[$nested][$module['nested']]['modules'][] = $module;
-							}
+                                if (is_array($label)) {
+                                    if (count($label) >= 2) {
+                                        array_shift($label);
+                                    }
+                                    $label = array_shift($label);
+                                }
 
-							unset($modules[$moduleName]);
-						}
-					}
-				}
-			}
+                                $menu[$nested][$module['nested']] = array(
+                                    'label' => $label,
+                                    'modules' => array($module),
+                                );
+                            } else {
+                                $menu[$nested][$module['nested']]['modules'][] = $module;
+                            }
 
-			$GLOBALS['TL_MOOTOOLS']['nested-menu'] = sprintf(
-				'<script>var nestedMenuItems = %s;</script>',
-				json_encode($menu)
-			);
-		}
-		return $navigation;
-	}
+                            unset($modules[$moduleName]);
+                        }
+                    }
+                }
+            }
 
-	/**
-	 * Generate the module.
-	 *
-	 * @return string
-	 */
-	public function generate()
-	{
-		$input = Input::getInstance();
+            $GLOBALS['TL_MOOTOOLS']['nested-menu'] = sprintf(
+                '<script>var nestedMenuItems = %s;</script>',
+                json_encode($menu)
+            );
+        }
 
-		$key = $input->get('key');
-		if ($key) {
-			$do = $input->get('do');
+        return $navigation;
+    }
 
-			foreach ($GLOBALS['BE_MOD'] as $modules) {
-				if (isset($modules[$do]) && isset($modules[$do][$key])) {
-					list($className, $methodName) = $modules[$do][$key];
+    /**
+     * Generate the module.
+     *
+     * @return string
+     */
+    public function generate()
+    {
+        $input = Input::getInstance();
 
-					$class = new ReflectionClass($className);
-					if ($class->hasMethod($methodName)) {
-						$module = $class->newInstance();
-						$method = $class->getMethod($methodName);
-						return $method->invoke($module, $this->objDc, $this->objDc->table, $GLOBALS['BE_MOD'][$do]);
-					}
-					else {
-						return sprintf(
-							'<p class="tl_error">Method %s:%s not found!</p>',
-							$className,
-							$methodName
-						);
-					}
-				}
-			}
+        $key = $input->get('key');
+        if ($key) {
+            $do = $input->get('do');
 
-			return sprintf(
-				'<p class="tl_error">Method %s not found!</p>',
-				$key
-			);
-		}
+            foreach ($GLOBALS['BE_MOD'] as $modules) {
+                if (isset($modules[$do]) && isset($modules[$do][$key])) {
+                    list($className, $methodName) = $modules[$do][$key];
 
-		if ($this->objDc->table) {
-			$act = $input->get('act');
+                    $class = new ReflectionClass($className);
+                    if ($class->hasMethod($methodName)) {
+                        $module = $class->newInstance();
+                        $method = $class->getMethod($methodName);
 
-			if (!strlen($act) || $act == 'paste' || $act == 'select') {
-				$act = ($this->objDc instanceof listable)
-					? 'showAll'
-					: 'edit';
-			}
+                        return $method->invoke($module, $this->objDc, $this->objDc->table, $GLOBALS['BE_MOD'][$do]);
+                    } else {
+                        return sprintf(
+                            '<p class="tl_error">Method %s:%s not found!</p>',
+                            $className,
+                            $methodName
+                        );
+                    }
+                }
+            }
 
-			switch ($act) {
-				case 'delete':
-				case 'show':
-				case 'showAll':
-				case 'undo':
-					if (!$this->objDc instanceof listable) {
-						$this->log(
-							'Data container ' . $this->objDc->table . ' is not listable',
-							'Backend getBackendModule()',
-							TL_ERROR
-						);
-						trigger_error(
-							'The current data container is not listable',
-							E_USER_ERROR
-						);
-					}
-					break;
+            return sprintf(
+                '<p class="tl_error">Method %s not found!</p>',
+                $key
+            );
+        }
 
-				case 'create':
-				case 'cut':
-				case 'cutAll':
-				case 'copy':
-				case 'copyAll':
-				case 'move':
-				case 'edit':
-					if (!$this->objDc instanceof editable) {
-						$this->log(
-							'Data container ' . $this->objDc->table . ' is not editable',
-							'Backend getBackendModule()',
-							TL_ERROR
-						);
-						trigger_error(
-							'The current data container is not editable',
-							E_USER_ERROR
-						);
-					}
-					break;
+        if ($this->objDc->table) {
+            $act = $input->get('act');
 
-				default:
-			}
+            if (!strlen($act) || $act == 'paste' || $act == 'select') {
+                $act = ($this->objDc instanceof listable)
+                    ? 'showAll'
+                    : 'edit';
+            }
 
-			return $this->objDc->$act();
-		}
+            switch ($act) {
+                case 'delete':
+                case 'show':
+                case 'showAll':
+                case 'undo':
+                    if (!$this->objDc instanceof listable) {
+                        $this->log(
+                            'Data container '.$this->objDc->table.' is not listable',
+                            'Backend getBackendModule()',
+                            TL_ERROR
+                        );
+                        trigger_error(
+                            'The current data container is not listable',
+                            E_USER_ERROR
+                        );
+                    }
+                    break;
 
-		return parent::generate();
-	}
+                case 'create':
+                case 'cut':
+                case 'cutAll':
+                case 'copy':
+                case 'copyAll':
+                case 'move':
+                case 'edit':
+                    if (!$this->objDc instanceof editable) {
+                        $this->log(
+                            'Data container '.$this->objDc->table.' is not editable',
+                            'Backend getBackendModule()',
+                            TL_ERROR
+                        );
+                        trigger_error(
+                            'The current data container is not editable',
+                            E_USER_ERROR
+                        );
+                    }
+                    break;
 
-	/**
-	 * Compile the current element
-	 *
-	 * @return void
-	 */
-	protected function compile()
-	{
-		$user  = BackendUser::getInstance();
-		$input = Input::getInstance();
+                default:
+            }
 
-		$navigation = $user->navigation(true);
+            return $this->objDc->$act();
+        }
 
-		$settings    = array(
-			'headline' => true
-		);
-		$do          = $input->get('do');
-		$groups      = array();
-		$preContent  = '';
-		$postContent = '';
+        return parent::generate();
+    }
 
-		foreach ($GLOBALS['BE_MOD'] as $modules) {
-			if (isset($modules[$do])) {
-				if (isset($modules[$do]['nested-config'])) {
-					$settings = array_merge(
-						$settings,
-						$modules[$do]['nested-config']
-					);
-				}
-				break;
-			}
-		}
+    /**
+     * Compile the current element.
+     */
+    protected function compile()
+    {
+        $user = BackendUser::getInstance();
+        $input = Input::getInstance();
 
-		// collect groups and items for nested menu
-		foreach ($navigation as $groupKey => $group) {
-			if (is_array($group['modules'])) {
-				$modules = & $navigation[$groupKey]['modules'];
-				foreach ($modules as $moduleName => $module) {
-					if (!empty($module['nested'])) {
-						list($nested) = explode(':', $module['nested']);
+        $navigation = $user->navigation(true);
 
-						if ($do == $nested) {
-							if (
-								isset($GLOBALS['TL_LANG']['MOD'][$moduleName]) &&
-								is_array($GLOBALS['TL_LANG']['MOD'][$moduleName])
-							) {
-								$module['description'] = $GLOBALS['TL_LANG']['MOD'][$moduleName][1];
-							}
+        $settings = array(
+            'headline' => true,
+        );
+        $do = $input->get('do');
+        $groups = array();
+        $preContent = '';
+        $postContent = '';
 
-							$groups[$module['nested']][$moduleName] = $module;
-						}
-					}
-				}
-			}
-		}
+        foreach ($GLOBALS['BE_MOD'] as $modules) {
+            if (isset($modules[$do])) {
+                if (isset($modules[$do]['nested-config'])) {
+                    $settings = array_merge(
+                        $settings,
+                        $modules[$do]['nested-config']
+                    );
+                }
+                break;
+            }
+        }
 
-		// HOOK: add custom logic
-		if (
-			isset($GLOBALS['TL_HOOKS']['nestedMenuItems']) &&
-			is_array($GLOBALS['TL_HOOKS']['nestedMenuItems'])
-		) {
-			foreach ($GLOBALS['TL_HOOKS']['nestedMenuItems'] as $callback) {
-				$this->import($callback[0]);
-				$groups = $this->$callback[0]->$callback[1]($do, $groups);
-			}
-		}
+        // collect groups and items for nested menu
+        foreach ($navigation as $groupKey => $group) {
+            if (is_array($group['modules'])) {
+                $modules = &$navigation[$groupKey]['modules'];
+                foreach ($modules as $moduleName => $module) {
+                    if (!empty($module['nested'])) {
+                        list($nested) = explode(':', $module['nested']);
 
-		// HOOK: add custom logic
-		if (
-			isset($GLOBALS['TL_HOOKS']['nestedMenuPreContent']) &&
-			is_array($GLOBALS['TL_HOOKS']['nestedMenuPreContent'])
-		) {
-			foreach ($GLOBALS['TL_HOOKS']['nestedMenuPreContent'] as $callback) {
-				$this->import($callback[0]);
-				$preContent .= $this->$callback[0]->$callback[1]($do, $groups);
-			}
-		}
+                        if ($do == $nested) {
+                            if (
+                                isset($GLOBALS['TL_LANG']['MOD'][$moduleName]) &&
+                                is_array($GLOBALS['TL_LANG']['MOD'][$moduleName])
+                            ) {
+                                $module['description'] = $GLOBALS['TL_LANG']['MOD'][$moduleName][1];
+                            }
 
-		// HOOK: add custom logic
-		if (
-			isset($GLOBALS['TL_HOOKS']['nestedMenuPostContent']) &&
-			is_array($GLOBALS['TL_HOOKS']['nestedMenuPostContent'])
-		) {
-			foreach ($GLOBALS['TL_HOOKS']['nestedMenuPostContent'] as $callback) {
-				$this->import($callback[0]);
-				$postContent .= $this->$callback[0]->$callback[1]($do, $groups);
-			}
-		}
+                            $groups[$module['nested']][$moduleName] = $module;
+                        }
+                    }
+                }
+            }
+        }
 
-		$this->Template->settings = $settings;
-		$this->Template->do       = $do;
-		$this->Template->pre      = $preContent;
-		$this->Template->post     = $postContent;
-		$this->Template->groups   = $groups;
-	}
+        // HOOK: add custom logic
+        if (
+            isset($GLOBALS['TL_HOOKS']['nestedMenuItems']) &&
+            is_array($GLOBALS['TL_HOOKS']['nestedMenuItems'])
+        ) {
+            foreach ($GLOBALS['TL_HOOKS']['nestedMenuItems'] as $callback) {
+                $this->import($callback[0]);
+                $groups = $this->$callback[0]->$callback[1]($do, $groups);
+            }
+        }
+
+        // HOOK: add custom logic
+        if (
+            isset($GLOBALS['TL_HOOKS']['nestedMenuPreContent']) &&
+            is_array($GLOBALS['TL_HOOKS']['nestedMenuPreContent'])
+        ) {
+            foreach ($GLOBALS['TL_HOOKS']['nestedMenuPreContent'] as $callback) {
+                $this->import($callback[0]);
+                $preContent .= $this->$callback[0]->$callback[1]($do, $groups);
+            }
+        }
+
+        // HOOK: add custom logic
+        if (
+            isset($GLOBALS['TL_HOOKS']['nestedMenuPostContent']) &&
+            is_array($GLOBALS['TL_HOOKS']['nestedMenuPostContent'])
+        ) {
+            foreach ($GLOBALS['TL_HOOKS']['nestedMenuPostContent'] as $callback) {
+                $this->import($callback[0]);
+                $postContent .= $this->$callback[0]->$callback[1]($do, $groups);
+            }
+        }
+
+        $this->Template->settings = $settings;
+        $this->Template->do = $do;
+        $this->Template->pre = $preContent;
+        $this->Template->post = $postContent;
+        $this->Template->groups = $groups;
+    }
 }
