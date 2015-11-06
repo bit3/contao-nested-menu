@@ -1,23 +1,9 @@
-<project name="Avisota" default="build">
-	<target name="clean">
-		<delete dir="${basedir}/build"/>
-	</target>
-
-	<target name="prepare">
-		<mkdir dir="${basedir}/build"/>
-		<mkdir dir="${basedir}/build/logs"/>
-	</target>
-
-	<target name="phpcs">
-		<exec dir="${basedir}"
-			  executable="${basedir}/vendor/bin/phpcs"
-			  output="${basedir}/build/logs/checkstyle.xml">
-			<arg line="-d 'error_reporting=E_ALL|~E_DEPRECATED|~E_NOTICE'
-			 		   --standard=${basedir}/vendor/bit3/php-coding-standard/Bit3Contao/ruleset.xml
-			 		   --extensions=php
-			 		   src"/>
-		</exec>
-	</target>
-
-	<target name="build" depends="clean,prepare,phpcs"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ This project is using the PHP code quality project (PHPCQ).
+ For documentation visit:
+   https://github.com/phpcq/phpcq
+-->
+<project name="nested-menu" default="build">
+    <import file="vendor/phpcq/phpcq/phpcq.main.xml" />
 </project>
