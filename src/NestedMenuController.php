@@ -9,6 +9,7 @@
  * @copyright  bit3 UG 2013
  * @author     Tristan Lins <tristan.lins@bit3.de>
  * @author     David Molineus <david.molineus@netzmacht.de>
+ * @author     Sven Baumann <baumann.sv@gmail.com>
  * @license    LGPL
  * @filesource
  */
@@ -62,7 +63,7 @@ class NestedMenuController extends TwigBackendModule
             foreach ($GLOBALS['BE_MOD'] as &$modules) {
                 foreach ($modules as $moduleKey => $module) {
                     if (!empty($module['nested'])) {
-                        $this->prepareNestedMenuEntry($module, $modules, $moduleKey);
+                        $this->prepareNestedMenuEntry($modules, $module, $moduleKey);
                     }
                 }
             }
