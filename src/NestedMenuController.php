@@ -62,7 +62,7 @@ class NestedMenuController extends TwigBackendModule
             foreach ($GLOBALS['BE_MOD'] as &$modules) {
                 foreach ($modules as $moduleKey => $module) {
                     if (!empty($module['nested'])) {
-                        $this->prepareNestedMenuEntry($module, $modules, $moduleKey);
+                        $this->prepareNestedMenuEntry($modules, $module, $moduleKey);
                     }
                 }
             }
