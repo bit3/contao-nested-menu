@@ -307,7 +307,7 @@ class NestedMenuController extends TwigBackendModule
         ) {
             foreach ($GLOBALS['TL_HOOKS']['nestedMenuItems'] as $callback) {
                 $this->import($callback[0]);
-                $groups = $this->$callback[0]->$callback[1]($do, $groups);
+                $groups = $this->{$callback[0]}->{$callback[1]}($do, $groups);
             }
         }
 
@@ -318,7 +318,7 @@ class NestedMenuController extends TwigBackendModule
         ) {
             foreach ($GLOBALS['TL_HOOKS']['nestedMenuPreContent'] as $callback) {
                 $this->import($callback[0]);
-                $preContent .= $this->$callback[0]->$callback[1]($do, $groups);
+                $preContent .= $this->{$callback[0]}->{$callback[1]}($do, $groups);
             }
         }
 
@@ -329,7 +329,7 @@ class NestedMenuController extends TwigBackendModule
         ) {
             foreach ($GLOBALS['TL_HOOKS']['nestedMenuPostContent'] as $callback) {
                 $this->import($callback[0]);
-                $postContent .= $this->$callback[0]->$callback[1]($do, $groups);
+                $postContent .= $this->{$callback[0]}->{$callback[1]}($do, $groups);
             }
         }
 
